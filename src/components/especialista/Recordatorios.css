@@ -1,0 +1,385 @@
+.recordatorios-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.recordatorios-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.recordatorios-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.recordatorios-header p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.btn-add-recordatorio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.2);
+}
+
+.btn-add-recordatorio:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+.recordatorio-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.recordatorio-form-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.recordatorio-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.recordatorio-form-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.recordatorio-form-modal form {
+  padding: 24px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.recordatorios-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.today-section {
+  border-radius: 16px;
+  padding: 24px;
+  color: black;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.today-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: #e5e7eb ;
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.summary-card svg {
+  opacity: 0.9;
+}
+
+.summary-value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.summary-label {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.appointments-today {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.appointments-today h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.appointment-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.appointment-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.appointment-details {
+  flex: 1;
+}
+
+.appointment-client {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.appointment-service {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+.appointment-status {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+}
+
+.recordatorios-list h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 16px;
+}
+
+.recordatorios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.recordatorio-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 4px solid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recordatorio-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.recordatorio-card.priority-high {
+  border-left-color: #ef4444;
+}
+
+.recordatorio-card.priority-medium {
+  border-left-color: #f59e0b;
+}
+
+.recordatorio-card.priority-low {
+  border-left-color: #10b981;
+}
+
+.recordatorio-card.completed {
+  opacity: 0.6;
+}
+
+.recordatorio-card.completed h4 {
+  text-decoration: line-through;
+}
+
+.recordatorio-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.priority-badge.priority-high {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.priority-badge.priority-medium {
+  background: #fef3c7;
+  color: #f59e0b;
+}
+
+.priority-badge.priority-low {
+  background: #d1fae5;
+  color: #10b981;
+}
+
+.btn-check {
+  background: none;
+  border: 2px solid #d1d5db;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #d1d5db;
+}
+
+.btn-check:hover {
+  border-color: #10b981;
+  background: #d1fae5;
+  color: #10b981;
+}
+
+.recordatorio-card.completed .btn-check {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.recordatorio-card h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.recordatorio-description {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.recordatorio-footer-card {
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.recordatorio-datetime {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recordatorio-date {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.recordatorio-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.no-recordatorios {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+}
+
+.no-recordatorios p {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .recordatorios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .today-summary {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,567 @@
+.horario-cobros-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.horario-cobros-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.horario-section,
+.servicios-section {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f3f4f6;
+  color: #1f2937;
+}
+
+.section-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.horarios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.horario-item {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid #3b82f6;
+  transition: all 0.2s ease;
+}
+
+.horario-item:hover {
+  background: #f3f4f6;
+}
+
+.horario-item-header {
+  margin-bottom: 12px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.dia-nombre {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.horario-inputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.time-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.time-input-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.time-input-group input[type="time"] {
+  padding: 8px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  transition: all 0.2s ease;
+}
+
+.time-input-group input[type="time"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.time-separator {
+  font-size: 18px;
+  font-weight: 700;
+  color: #9ca3af;
+  margin-top: 20px;
+}
+
+.dia-cerrado {
+  padding: 8px 0;
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.btn-agregar-servicio {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 20px;
+}
+
+.btn-agregar-servicio:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.formulario-servicio {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.formulario-servicio h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input {
+  padding: 10px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.btn-guardar,
+.btn-cancelar-hc {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-guardar {
+  background: #10b981;
+  color: white;
+}
+
+.btn-guardar:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.servicios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.servicio-card-cobros {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid #10b981;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.servicio-card-cobros:hover {
+  background: #f3f4f6;
+  transform: translateX(4px);
+}
+
+.servicio-info-hc {
+  flex: 1;
+}
+
+.servicio-info h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.servicio-detalles {
+  display: flex;
+  gap: 16px;
+}
+
+.servicio-duracion,
+.servicio-precio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.servicio-precio {
+  color: #10b981;
+}
+
+.servicio-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit {
+  background: #dbeafe;
+  color: #3b82f6;
+}
+
+.btn-edit:hover {
+  background: #3b82f6;
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.btn-delete:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-save {
+  background: #d1fae5;
+  color: #10b981;
+}
+
+.btn-save:hover {
+  background: #10b981;
+  color: white;
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.btn-cancel:hover {
+  background: #6b7280;
+  color: white;
+}
+
+.servicio-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.edit-input-nombre {
+  padding: 8px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.edit-input-nombre:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.edit-inputs-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-input-small {
+  width: 80px;
+  padding: 8px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.edit-input-small:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.edit-inputs-row span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.resumen-section {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.resumen-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 20px 0;
+}
+
+.resumen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.resumen-card {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 12px;
+  padding: 20px;
+  color: white;
+  text-align: center;
+}
+
+.resumen-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.resumen-value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 1024px) {
+  .horario-cobros-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .horario-inputs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .time-separator {
+    display: none;
+  }
+
+  .resumen-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Nuevos estilos estéticos y únicos para los botones de Horario de Atención (con nombres únicos) */
+.horario-edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto; /* Permite texto completo "Editar" sin cortar */
+  padding: 8px 16px; /* Padding para botones con texto + icon */
+  gap: 6px; /* Espacio entre icon y texto */
+  font-size: 14px;
+  font-weight: 600;
+  background: #dbeafe;
+  color: #3b82f6;
+  border: none;
+  border-radius: 10px; /* Más redondeado para estética moderna */
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1); /* Sombra sutil inicial */
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, background 0.3s ease; /* Transición suave */
+}
+
+.horario-edit-btn:hover {
+  background: #3b82f6;
+  color: white;
+  transform: translateY(-2px) scale(1.05); /* Efecto lift + leve zoom */
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.2); /* Sombra más pronunciada */
+  opacity: 0.95; /* Leve fade para dinamismo */
+}
+
+.horario-save-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 10px; /* Consistente con Editar */
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1); /* Sombra inicial verde */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.horario-save-btn:hover {
+  background: #059669;
+  transform: translateY(-2px) scale(1.05); /* Igual que Editar para coherencia */
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.2); /* Glow verde */
+}
+
+.horario-cancel-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 10px; /* Consistente */
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.1); /* Sombra inicial gris */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.horario-cancel-btn:hover {
+  background: #4b5563;
+  transform: translateY(-2px) scale(1.05); /* Igual para uniformidad */
+  box-shadow: 0 6px 16px rgba(107, 114, 128, 0.2); /* Glow gris */
+}
+
+/* Ajustes para icons en los botones únicos (mejora integración) */
+.horario-edit-btn svg,
+.horario-save-btn svg,
+.horario-cancel-btn svg {
+  transition: transform 0.3s ease; /* Animación en icon al hover */
+}
+
+.horario-edit-btn:hover svg,
+.horario-save-btn:hover svg,
+.horario-cancel-btn:hover svg {
+  transform: scale(1.2); /* Leve zoom en icon para feedback visual */
+}
+
+/* Media query para mobile (ajustes para botones únicos) */
+@media (max-width: 768px) {
+  .horario-edit-btn,
+  .horario-save-btn,
+  .horario-cancel-btn {
+    font-size: 13px; /* Más pequeño en mobile */
+    padding: 8px 14px; /* Ajuste de padding */
+  }
+  
+  .form-actions {
+    flex-direction: column; /* Apila botones en mobile si es necesario */
+    gap: 8px;
+  }
+}

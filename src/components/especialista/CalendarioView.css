@@ -1,0 +1,481 @@
+.calendario-view {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+  height: 100%;
+}
+
+.calendario-main {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.calendar-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: capitalize;
+}
+
+.month-nav-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 8px;
+  color: #0f172a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.month-nav-btn:hover {
+  background: #e2e8f0;
+  transform: scale(1.05);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  padding: 12px;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.calendar-day {
+  min-height: 100px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: white;
+}
+
+.calendar-day.empty {
+  background: #f8fafc;
+  cursor: default;
+  border-color: transparent;
+}
+
+.calendar-day:not(.empty):hover {
+  border-color: #0ea5e9;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
+}
+
+.calendar-day.today {
+  border-color: #0ea5e9;
+  background: #f0f9ff;
+}
+
+.calendar-day.selected {
+  border-color: #0284c7;
+  background: #e0f2fe;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.calendar-day.has-appointments {
+  background: linear-gradient(to bottom, #f8fafc 0%, white 100%);
+}
+
+.day-number {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.day-appointments {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.appointment-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.appointment-indicator.pendiente {
+  background: #fef3c7;
+  color: #f59e0b;
+}
+
+.appointment-indicator.confirmada {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.appointment-indicator.completada {
+  background: #dbeafe;
+  color: #0284c7;
+}
+
+.appointment-indicator span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.more-appointments {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.calendario-sidebar {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.sidebar-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: capitalize;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 6px;
+  color: #64748b;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.btn-add-appointment {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.btn-add-appointment:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.appointment-form-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appointment-form-compact .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.appointment-form-compact .form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.appointment-form-compact input,
+.appointment-form-compact select,
+.appointment-form-compact textarea {
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #0f172a;
+  transition: all 0.3s ease;
+}
+
+.appointment-form-compact input:focus,
+.appointment-form-compact select:focus,
+.appointment-form-compact textarea:focus {
+  outline: none;
+  border-color: #0ea5e9;
+}
+
+.appointment-form-compact textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.btn-submit-compact {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.btn-submit-compact:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3);
+}
+
+.date-appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.appointment-detail-card {
+  padding: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.appointment-detail-card:hover {
+  border-color: #0ea5e9;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+}
+
+.appointment-detail-card.pendiente {
+  border-left: 4px solid #fbbf24;
+}
+
+.appointment-detail-card.confirmada {
+  border-left: 4px solid #10b981;
+}
+
+.appointment-detail-card.completada {
+  border-left: 4px solid #0ea5e9;
+}
+
+.appointment-time-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.appointment-detail-card h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.appointment-detail-card p {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.appointment-detail-card .status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.appointment-detail-card .status-badge.pendiente {
+  background: #fef3c7;
+  color: #f59e0b;
+}
+
+.appointment-detail-card .status-badge.confirmada {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.appointment-detail-card .status-badge.completada {
+  background: #dbeafe;
+  color: #0284c7;
+}
+
+.appointment-actions-inline {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-icon {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.btn-icon.confirm {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.btn-icon.confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-icon.reject {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.btn-icon.reject:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-icon.complete {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+}
+
+.btn-icon.complete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.no-appointments,
+.no-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.no-appointments svg,
+.no-selection svg {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.no-appointments p,
+.no-selection p {
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.btn-create-first {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-create-first:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3);
+}
+
+@media (max-width: 1400px) {
+  .calendario-view {
+    grid-template-columns: 1fr 350px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .calendario-view {
+    grid-template-columns: 1fr;
+  }
+
+  .calendario-sidebar {
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-day {
+    min-height: 80px;
+    padding: 6px;
+  }
+
+  .day-number {
+    font-size: 14px;
+  }
+
+  .appointment-indicator {
+    font-size: 10px;
+    padding: 3px 5px;
+  }
+
+  .calendar-header h2 {
+    font-size: 20px;
+  }
+}
