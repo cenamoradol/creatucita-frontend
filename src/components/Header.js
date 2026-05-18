@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, User, Calendar, Briefcase, LogOut, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { Search, User, Calendar, LogOut, ChevronDown, LayoutDashboard, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../components/Header.css';
 
@@ -21,15 +21,6 @@ const Header = () => {
     logout();
     setShowUserMenu(false);
     navigate('/');
-  };
-
-  const handleEspecialistaClick = (e) => {
-    e.preventDefault();
-    if (user && user.role === 'specialist') {
-      navigate('/especialista/panel');
-    } else {
-      navigate('/especialista/login');
-    }
   };
 
   return (
@@ -60,16 +51,17 @@ const Header = () => {
           </form>
 
           <div className="header-actions">
-            {user && user.role === 'specialist' ? (
+            {user?.role === 'admin' && (
+              <Link to="/admin" className="header-link header-link-admin">
+                <Shield size={20} />
+                <span>Panel Administrador</span>
+              </Link>
+            )}
+            {user?.role === 'specialist' && (
               <Link to="/especialista/panel" className="header-link header-link-specialist">
                 <LayoutDashboard size={20} />
                 <span>Panel Especialista</span>
               </Link>
-            ) : (
-              <a href="#" onClick={handleEspecialistaClick} className="header-link header-link-specialist">
-                <Briefcase size={20} />
-                <span>Soy Especialista</span>
-              </a>
             )}
             <Link to="/citas-pendientes" className="header-link header-link-citas">
               <Calendar size={20} />
@@ -109,6 +101,12 @@ const Header = () => {
                       <Calendar size={18} />
                       <span>Mis Citas</span>
                     </Link>
+                    {user.role === 'admin' && (
+                      <Link to="/admin" className="dropdown-item" onClick={() => setShowUserMenu(false)}>
+                        <Shield size={18} />
+                        <span>Panel Administrador</span>
+                      </Link>
+                    )}
                     {user.role === 'specialist' && (
                       <Link to="/especialista/panel" className="dropdown-item" onClick={() => setShowUserMenu(false)}>
                         <LayoutDashboard size={18} />

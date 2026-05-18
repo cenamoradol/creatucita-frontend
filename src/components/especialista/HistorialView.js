@@ -1,92 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, DollarSign, Filter, Search, FileText, Loader2 } from 'lucide-react';
-import { useAuthEspecialista } from '../../context/AuthContextEspecialista';
+import React, { useState } from 'react';
+import { Calendar, Clock, User, DollarSign, Filter, Search, FileText } from 'lucide-react';
 import './HistorialView.css';
 
-const HistorialView = () => {
-  const { especialista, token } = useAuthEspecialista();
-  const [appointments, setAppointments] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+const HistorialView = ({ appointments = [] }) => {
   const [filterStatus, setFilterStatus] = useState('todos');
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    const fetchHistorial = async () => {
-      if (!especialista?.especialistaid || !token) {
-        setError('No hay especialista autenticado o token inválido');
-        setIsLoading(false);
-        return;
-      }
+  const getClientName = (apt) => {
+    return apt.client?.name || apt.clientName || 'Cliente';
+  };
 
-      try {
-        setIsLoading(true);
-        setError(null);
+  const getClientEmail = (apt) => {
+    return apt.client?.email || apt.clientEmail || '';
+  };
 
-        const res = await fetch(
-          `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/citas/historial/${especialista.especialistaid}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+  const getClientPhone = (apt) => {
+    return apt.client?.phone || apt.clientPhone || '';
+  };
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const data = await res.json();
-        setAppointments(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error('Error cargando historial:', err);
-        setError(err.message || 'No se pudo cargar el historial');
-      } finally {
-        setIsLoading(false);
-      }
+  const getStatusLabel = (status) => {
+    const statusMap = {
+      'pending': 'Pendiente',
+      'confirmed': 'Confirmada',
+      'completed': 'Completada',
+      'cancelled': 'Cancelada'
     };
-
-    fetchHistorial();
-  }, [especialista?.especialistaid, token]);
-
-  const getNormalizedStatus = (status, statusEspecialista) => {
-    const s = statusEspecialista || status || 'pendiente';
-    return s.toLowerCase();
+    return statusMap[status] || status;
   };
 
   const filtered = appointments
     .filter((apt) => {
-      const st = getNormalizedStatus(apt.status, apt.status_especialista);
-      return filterStatus === 'todos' || st === filterStatus;
+      const status = apt.status?.toLowerCase();
+      if (filterStatus === 'todos') return true;
+      return status === filterStatus;
     })
     .filter((apt) =>
       !searchTerm ||
-      apt.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      apt.clientEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      apt.service?.toLowerCase().includes(searchTerm.toLowerCase())
+      getClientName(apt).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getClientEmail(apt).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (apt.service || '').toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  const completedCount = appointments.filter(a => getNormalizedStatus(a.status, a.status_especialista) === 'completada').length;
-  const canceledCount  = appointments.filter(a => getNormalizedStatus(a.status, a.status_especialista) === 'cancelada').length;
+  const completedCount = appointments.filter(a => a.status === 'completed').length;
+  const canceledCount = appointments.filter(a => a.status === 'cancelled').length;
 
-  if (isLoading) return (
-    <div className="historial-loading">
-      <Loader2 className="animate-spin" size={40} />
-      <p>Cargando historial...</p>
-    </div>
-  );
-
-  if (error) return (
-    <div className="historial-error">
-      <p>{error}</p>
-      <button onClick={() => window.location.reload()}>Reintentar</button>
-    </div>
-  );
+  if (appointments.length === 0) {
+    return (
+      <div className="historial-view">
+        <div className="empty-historial">
+          <Calendar size={64} strokeWidth={1.5} />
+          <h3>No hay citas</h3>
+          <p>Aún no tienes historial</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="historial-view">
-      {/* Header con stats y filtros – igual que antes */}
       <div className="historial-header-section">
         <div className="historial-stats-row">
           <div className="stat-box completed"><div className="stat-value">{completedCount}</div><div className="stat-title">Completadas</div></div>
@@ -107,10 +79,10 @@ const HistorialView = () => {
             <Filter size={20} />
             <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
               <option value="todos">Todos</option>
-              <option value="completada">Completadas</option>
-              <option value="confirmada">Confirmadas</option>
-              <option value="pendiente">Pendientes</option>
-              <option value="cancelada">Canceladas</option>
+              <option value="completed">Completadas</option>
+              <option value="confirmed">Confirmadas</option>
+              <option value="pending">Pendientes</option>
+              <option value="cancelled">Canceladas</option>
             </select>
           </div>
         </div>
@@ -126,7 +98,7 @@ const HistorialView = () => {
         ) : (
           <div className="historial-timeline">
             {filtered.map(apt => {
-              const status = getNormalizedStatus(apt.status, apt.status_especialista);
+              const status = apt.status?.toLowerCase() || 'pending';
               const fecha = new Date(apt.date);
 
               return (
@@ -141,13 +113,13 @@ const HistorialView = () => {
                       <div className="client-section">
                         <div className="client-avatar-historial"><User size={20} /></div>
                         <div className="client-info-historial">
-                          <h4>{apt.clientName || '—'}</h4>
-                          <p className="email">{apt.clientEmail || '—'}</p>
-                          <p className="phone">{apt.clientPhone || '—'}</p>
+                          <h4>{getClientName(apt)}</h4>
+                          <p className="email">{getClientEmail(apt) || '—'}</p>
+                          <p className="phone">{getClientPhone(apt) || '—'}</p>
                         </div>
                       </div>
                       <span className={`status-pill ${status}`}>
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                        {getStatusLabel(status)}
                       </span>
                     </div>
 
@@ -158,17 +130,16 @@ const HistorialView = () => {
                       </div>
                       <div className="info-row">
                         <Clock size={16} />
-                        <span>{apt.hour || '—'}</span>           {/* ← clave: usa hour */}
+                        <span>{apt.startTime || '—'}</span>
                       </div>
                       <div className="info-row service-row">
                         <span className="service-label">{apt.service || 'Servicio no especificado'}</span>
-                        <span className="duration-badge">{apt.duration ? `${apt.duration} min` : '—'}</span>
                       </div>
                       <div className="info-row price-row">
                         <DollarSign size={16} />
                         <span className="price-value">L. {Number(apt.price || 0).toLocaleString('es-HN')}</span>
-                        <span className={`payment-badge ${status === 'completada' ? 'paid' : 'pending'}`}>
-                          {status === 'completada' ? 'Pagado' : 'Pendiente'}
+                        <span className={`payment-badge ${status === 'completed' ? 'paid' : 'pending'}`}>
+                          {status === 'completed' ? 'Pagado' : 'Pendiente'}
                         </span>
                       </div>
                     </div>

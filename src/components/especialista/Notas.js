@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Plus, Save, X, Archive, Trash2, Edit2, Search } from 'lucide-react';
-import { useAuthEspecialista } from '../../context/AuthContextEspecialista';
 import './Notas.css';
 
-const Notas = () => {
-  const { especialista, token } = useAuthEspecialista();
-  const [notas, setNotas] = useState([]);
+const Notas = ({ notas = [], token, onAddNote, onUpdateNote, onArchiveNote, onDeleteNote }) => {
   const [showForm, setShowForm] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,74 +12,45 @@ const Notas = () => {
     content: '',
     category: 'Paciente'
   });
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
-
-  useEffect(() => {
-    if (especialista && token) {
-      fetchNotas();
-    } else {
-      setLoading(false);
-    }
-  }, [especialista, token]);
-
-  const fetchNotas = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_URL}/specialists/notes`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (!response.ok) {
-        throw new Error('Error al cargar notas');
-      }
-      const data = await response.json();
-      setNotas(data); // In the new backend, fields match or are handled by entity
-      setLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editingNote) {
-        // Actualizar nota
-        const response = await fetch(`${API_URL}/specialists/notes/${editingNote.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
-        if (!response.ok) {
-          throw new Error('Error al actualizar nota');
+        if (onUpdateNote) {
+          onUpdateNote(editingNote.id, formData);
+        } else {
+          const response = await fetch(`${API_URL}/specialists/notes/${editingNote.id}`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+          if (!response.ok) throw new Error('Error al actualizar nota');
         }
         setEditingNote(null);
       } else {
-        // Crear nueva nota
-        const response = await fetch(`${API_URL}/specialists/notes`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
-        if (!response.ok) {
-          throw new Error('Error al crear nota');
+        if (onAddNote) {
+          onAddNote(formData);
+        } else {
+          const response = await fetch(`${API_URL}/specialists/notes`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+          if (!response.ok) throw new Error('Error al crear nota');
         }
       }
       setFormData({ title: '', content: '', category: 'Paciente' });
       setShowForm(false);
-      fetchNotas(); 
     } catch (err) {
       setError(err.message);
     }
@@ -105,38 +73,38 @@ const Notas = () => {
   };
 
   const handleArchive = async (id) => {
-    try {
-      const response = await fetch(`${API_URL}/specialists/notes/${id}/archive`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (!response.ok) {
-        throw new Error('Error al archivar nota');
+    if (onArchiveNote) {
+      onArchiveNote(id);
+    } else {
+      try {
+        await fetch(`${API_URL}/specialists/notes/${id}/archive`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (err) {
+        setError(err.message);
       }
-      fetchNotas();
-    } catch (err) {
-      setError(err.message);
     }
   };
 
   const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`${API_URL}/specialists/notes/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (!response.ok) {
-        throw new Error('Error al eliminar nota');
+    if (onDeleteNote) {
+      onDeleteNote(id);
+    } else {
+      try {
+        await fetch(`${API_URL}/specialists/notes/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (err) {
+        setError(err.message);
       }
-      fetchNotas();
-    } catch (err) {
-      setError(err.message);
     }
   };
 
@@ -149,7 +117,6 @@ const Notas = () => {
     return matchesSearch && matchesCategory;
   });
 
-  if (loading) return <div>Cargando notas...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (

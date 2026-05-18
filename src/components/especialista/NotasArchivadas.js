@@ -1,70 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Archive, ArchiveRestore, Trash2, Search } from 'lucide-react';
-import { useAuthEspecialista } from '../../context/AuthContextEspecialista'; 
 import './NotasArchivadas.css';
 
-const NotasArchivadas = () => {
-  const { especialista, token } = useAuthEspecialista();
-  const [notas, setNotas] = useState([]);
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+
+const NotasArchivadas = ({ notas = [], token, onRestoreNote, onDeleteNote }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('todas');
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
-
-  useEffect(() => {
-    if (especialista && token) {
-      fetchArchivedNotas();
-    } else {
-      setLoading(false);
-    }
-  }, [especialista, token]);
-
-  const fetchArchivedNotas = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_URL}/notas/archived/${especialista.especialistaid}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (!response.ok) {
-        throw new Error('Error al cargar notas archivadas');
-      }
-      const data = await response.json();
-      // Mapear datos del backend al formato esperado en frontend
-      const mappedNotas = data.map(nota => ({
-        id: nota.idnotas,
-        title: nota.titulo,
-        content: nota.nota_contenido,
-        category: nota.nota_categoria,
-        createdAt: nota.created_by, 
-        archived: true,
-        status: nota.nota_status
-      }));
-      setNotas(mappedNotas);
-      setLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
+  const archivedNotas = notas.filter(nota => nota.archived);
 
   const handleRestore = async (id) => {
+    if (onRestoreNote) {
+      onRestoreNote(id);
+      return;
+    }
     try {
-      const response = await fetch(`${API_URL}/notas/restore/${id}`, {
-        method: 'PUT',
+      await fetch(`${API_URL}/specialists/notes/${id}/archive`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      if (!response.ok) {
-        throw new Error('Error al restaurar nota');
-      }
-      fetchArchivedNotas(); 
     } catch (err) {
       setError(err.message);
     }
@@ -72,25 +31,23 @@ const NotasArchivadas = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar esta nota permanentemente?')) {
+      if (onDeleteNote) {
+        onDeleteNote(id);
+        return;
+      }
       try {
-        const response = await fetch(`${API_URL}/notas/${id}`, {
+        await fetch(`${API_URL}/specialists/notes/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
-        if (!response.ok) {
-          throw new Error('Error al eliminar nota');
-        }
-        fetchArchivedNotas();
       } catch (err) {
         setError(err.message);
       }
     }
   };
-
-  const archivedNotas = notas;
 
   const filteredNotas = archivedNotas.filter(nota => {
     const matchesSearch = nota.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -99,7 +56,6 @@ const NotasArchivadas = () => {
     return matchesSearch && matchesCategory;
   });
 
-  if (loading) return <div>Cargando notas archivadas...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -166,7 +122,7 @@ const NotasArchivadas = () => {
             </div>
           ) : (
             filteredNotas.map(nota => (
-              <div key={nota.id} className={`nota-archivada-card ${nota.category.toLowerCase()}`}>
+              <div key={nota.id} className={`nota-archivada-card ${nota.category?.toLowerCase() || 'paciente'}`}>
                 <div className="nota-category-badge">{nota.category}</div>
                 <h3>{nota.title}</h3>
                 <p className="nota-content">{nota.content}</p>

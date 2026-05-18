@@ -27,6 +27,9 @@ import ConfirmResetEspecialista from './pages/especialista/ConfirmResetEspeciali
 // Páginas de Búsqueda
 import BusquedaResultados from './pages/BusquedaResultados';
 
+// Páginas de Administrador
+import PanelAdministrador from './pages/admin/PanelAdministrador';
+
 const App = () => {
   return (
     <AuthProvider>
@@ -59,6 +62,9 @@ const App = () => {
                     </ProtectedRouteEspecialista>
                   }
                 />
+
+                {/* Rutas de Administrador */}
+                <Route path="/admin" element={<PanelAdministrador />} />
 
               </Routes>
             </main>

@@ -162,10 +162,39 @@
 }
 
 .header-link-specialist {
+  background: #10b981;
   color: white;
-  background: linear-gradient(135deg, #28a745 0%, #20863a 100%);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.header-link-specialist:hover {
+  background: #059669;
+}
+
+.header-link-admin {
+  background: #7c3aed;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.header-link-admin:hover {
+  background: #6d28d9;
 }
 
 .header-link-specialist:hover {

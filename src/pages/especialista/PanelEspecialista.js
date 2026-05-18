@@ -35,6 +35,7 @@ const PanelEspecialista = () => {
   const [notas, setNotas] = useState([]);
   const [recordatorios, setRecordatorios] = useState([]);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
+  const [specialistData, setSpecialistData] = useState(null);
 
   useEffect(() => {
     if (!user || user.role !== 'specialist') {
@@ -90,7 +91,34 @@ const PanelEspecialista = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [user]);
+
+  useEffect(() => {
+    const fetchSpecialistData = async () => {
+      try {
+        const token = user?.access_token;
+        if (!token) return;
+
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+        const response = await fetch(`${API_URL}/specialists/me`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setSpecialistData(data);
+        }
+      } catch (error) {
+        console.error('Error al obtener datos del especialista:', error);
+      }
+    };
+
+    fetchSpecialistData();
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -179,15 +207,16 @@ const PanelEspecialista = () => {
     ));
   };
 
-  const pendingAppointments = appointments.filter(apt => apt.status === 'pendiente');
-  const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmada');
-  const completedAppointments = appointments.filter(apt => apt.status === 'completada');
+  const pendingAppointments = appointments.filter(apt => apt.status === 'pending');
+  const confirmedAppointments = appointments.filter(apt => apt.status === 'confirmed');
+  const completedAppointments = appointments.filter(apt => apt.status === 'completed');
 
   const activeNotas = notas.filter(nota => !nota.archived);
   const pendingRecordatorios = recordatorios.filter(rec => !rec.completed);
   const today = new Date().toISOString().split('T')[0];
   const todayRecordatorios = recordatorios.filter(r => r.date === today && !r.completed);
   const recentNotas = activeNotas.slice(0, 3);
+  const activeRecordatorios = recordatorios.filter(r => !r.completed);
 
   const renderDashboard = () => (
     <div className="dashboard-content">
@@ -253,11 +282,11 @@ const PanelEspecialista = () => {
               .filter(apt => {
                 const aptDate = new Date(apt.date);
                 const now = new Date();
-                return apt.status === 'completada' && apt.paid &&
+                return apt.status === 'completed' &&
                   aptDate.getMonth() === now.getMonth() &&
                   aptDate.getFullYear() === now.getFullYear();
               })
-              .reduce((sum, apt) => sum + (apt.price || 0), 0)
+              .reduce((sum, apt) => sum + (parseFloat(apt.price) || 0), 0)
               .toLocaleString()}
           </div>
         </div>
@@ -281,10 +310,10 @@ const PanelEspecialista = () => {
             <button className="section-link" onClick={() => setActiveTab('reminders')}>Ver todos</button>
           </div>
           <div className="recordatorios-dashboard">
-            {recordatorios.length === 0 ? (
+            {todayRecordatorios.length === 0 ? (
               <div className="empty-message"><p>No hay recordatorios para hoy</p></div>
             ) : (
-              recordatorios.map(rec => (
+              todayRecordatorios.map(rec => (
                 <div key={rec.id} className={`recordatorio-item priority-${rec.priority}`}>
                   <div className="recordatorio-item-header">
                     <span className="recordatorio-item-time">{rec.time}</span>
@@ -307,10 +336,10 @@ const PanelEspecialista = () => {
             <button className="section-link" onClick={() => setActiveTab('notes')}>Ver todas</button>
           </div>
           <div className="notas-dashboard">
-            {notas.length === 0 ? (
+            {activeNotas.length === 0 ? (
               <div className="empty-message"><p>No hay notas recientes</p></div>
             ) : (
-              notas.slice(0, 5).map(nota => (
+              activeNotas.slice(0, 5).map(nota => (
                 <div key={nota.id} className={`nota-item category-${nota.category.toLowerCase()}`}>
                   <div className="nota-item-header">
                     <span className="nota-category-label">{nota.category}</span>
@@ -453,6 +482,7 @@ const PanelEspecialista = () => {
           {activeTab === 'notas' && (
             <Notas
               notas={notas}
+              token={user?.access_token}
               onAddNote={handleAddNote}
               onUpdateNote={handleUpdateNote}
               onArchiveNote={handleArchiveNote}
@@ -463,6 +493,7 @@ const PanelEspecialista = () => {
             <Recordatorios
               recordatorios={recordatorios}
               appointments={appointments}
+              token={user?.access_token}
               onAddRecordatorio={handleAddRecordatorio}
               onToggleRecordatorio={handleToggleRecordatorio}
             />
@@ -470,14 +501,17 @@ const PanelEspecialista = () => {
           {activeTab === 'notasArchivadas' && (
             <NotasArchivadas
               notas={notas}
+              token={user?.access_token}
               onRestoreNote={handleRestoreNote}
               onDeleteNote={handleDeleteNote}
             />
           )}
           {activeTab === 'profile' && (
             <PerfilView
-              especialista={user}
+              especialista={specialistData}
+              token={user?.access_token}
               appointments={appointments}
+              onUpdate={(updatedData) => setSpecialistData(updatedData)}
             />
           )}
         </div>

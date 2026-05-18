@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Plus, Save, X, Check, Clock, AlertCircle, Calendar } from 'lucide-react';
-import { useAuthEspecialista } from '../../context/AuthContextEspecialista';
 import './Recordatorios.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
 
-const Recordatorios = ({ appointments }) => {
-  const { token } = useAuthEspecialista();
-  const [recordatorios, setRecordatorios] = useState([]);
-  const [loading, setLoading] = useState(true);
+const Recordatorios = ({ recordatorios = [], appointments = [], token, onAddRecordatorio, onToggleRecordatorio }) => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -17,37 +13,19 @@ const Recordatorios = ({ appointments }) => {
     time: '',
     priority: 'media',
   });
-  const [timeouts, setTimeouts] = useState({});
-
-  // Cargar recordatorios al montar
-  useEffect(() => {
-    const fetchRecordatorios = async () => {
-      if (!token) return;
-      try {
-        const res = await fetch(`${API_URL}/specialists/reminders`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!res.ok) throw new Error('Error al cargar recordatorios');
-        const data = await res.json();
-        setRecordatorios(data);
-      } catch (err) {
-        console.error('Error fetching recordatorios:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecordatorios();
-  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const today = new Date().toISOString().split('T')[0];
     if (formData.date < today) {
       alert('No se pueden crear recordatorios en fechas pasadas.');
+      return;
+    }
+
+    if (onAddRecordatorio) {
+      onAddRecordatorio(formData);
+      setFormData({ title: '', description: '', date: '', time: '', priority: 'media' });
+      setShowForm(false);
       return;
     }
 
@@ -64,9 +42,6 @@ const Recordatorios = ({ appointments }) => {
 
       if (!res.ok) throw new Error('Error al crear recordatorio');
 
-      const newRec = await res.json();
-      setRecordatorios((prev) => [...prev, newRec]);
-
       setFormData({ title: '', description: '', date: '', time: '', priority: 'media' });
       setShowForm(false);
     } catch (err) {
@@ -78,8 +53,13 @@ const Recordatorios = ({ appointments }) => {
   const handleToggleCompletado = async (id, currentCompleted) => {
     const newCompleted = !currentCompleted;
 
+    if (onToggleRecordatorio) {
+      onToggleRecordatorio(id);
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_URL}/specialists/reminders/${id}`, {
+      await fetch(`${API_URL}/specialists/reminders/${id}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -87,47 +67,11 @@ const Recordatorios = ({ appointments }) => {
         },
         body: JSON.stringify({ completed: newCompleted }),
       });
-
-      if (!res.ok) throw new Error('Error al actualizar');
-
-      // Actualizar estado local
-      setRecordatorios((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, completed: newCompleted } : r))
-      );
-
-      // Lógica de eliminación diferida
-      if (newCompleted) {
-        const timeoutId = setTimeout(async () => {
-          try {
-            const deleteRes = await fetch(`${API_URL}/specialists/reminders/${id}`, {
-              method: 'DELETE',
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              },
-            });
-
-            if (!deleteRes.ok) throw new Error('Error al eliminar');
-
-            setRecordatorios((prev) => prev.filter((r) => r.id !== id));
-          } catch (deleteErr) {
-            console.error('Error eliminando recordatorio automático:', deleteErr);
-          }
-        }, 60000); 
-        setTimeouts((prev) => ({ ...prev, [id]: timeoutId }));
-      } else {
-        if (timeouts[id]) {
-          clearTimeout(timeouts[id]);
-          const { [id]: removed, ...rest } = timeouts;
-          setTimeouts(rest);
-        }
-      }
     } catch (err) {
       console.error('Error toggling completado:', err);
     }
   };
 
-  // Filtros
   const today = new Date().toISOString().split('T')[0];
   const todayRecordatorios = recordatorios.filter((r) => r.date === today);
   const todayAppointments = appointments.filter(
@@ -139,8 +83,6 @@ const Recordatorios = ({ appointments }) => {
   };
 
   const getPriorityLabel = (p) => (p === 'alta' ? 'Alta' : p === 'media' ? 'Media' : 'Baja');
-
-  if (loading) return <div className="loading">Cargando recordatorios...</div>;
 
   return (
     <div className="recordatorios-container">
