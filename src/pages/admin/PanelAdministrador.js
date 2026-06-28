@@ -119,7 +119,7 @@ const PanelAdministrador = () => {
   };
 
   const handleRestoreUser = async (id) => {
-    if (!confirm('¿Restaurar este usuario?')) return;
+    if (!window.confirm('¿Restaurar este usuario?')) return;
     
     const token = user?.access_token;
     try {
@@ -189,7 +189,7 @@ const PanelAdministrador = () => {
   };
 
   const handleDeleteUser = async (id) => {
-    if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
+    if (!window.confirm('¿Estás seguro de eliminar este usuario?')) return;
     
     const token = user?.access_token;
     try {
@@ -268,7 +268,7 @@ const PanelAdministrador = () => {
   };
 
   const handleDeleteCategory = async (id) => {
-    if (!confirm('¿Eliminar esta categoría?')) return;
+    if (!window.confirm('¿Eliminar esta categoría?')) return;
     try {
       await fetch(`${API_URL}/categories/${id}`, { method: 'DELETE' });
       fetchData();
@@ -297,7 +297,7 @@ const PanelAdministrador = () => {
   };
 
   const handleDeleteSubcategory = async (id) => {
-    if (!confirm('¿Eliminar esta subcategoría?')) return;
+    if (!window.confirm('¿Eliminar esta subcategoría?')) return;
     try {
       await fetch(`${API_URL}/categories/subcategories/${id}`, { method: 'DELETE' });
       fetchData();
