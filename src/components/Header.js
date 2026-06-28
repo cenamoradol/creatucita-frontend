@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, User, Calendar, LogOut, ChevronDown, LayoutDashboard, Shield } from 'lucide-react';
+import { Search, Calendar, LogOut, ChevronDown, LayoutDashboard, Shield, Menu, User, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../components/Header.css';
 
@@ -21,6 +21,14 @@ const Header = () => {
     logout();
     setShowUserMenu(false);
     navigate('/');
+  };
+
+  const toggleUserMenu = () => {
+    setShowUserMenu(!showUserMenu);
+  };
+
+  const closeMenu = () => {
+    setShowUserMenu(false);
   };
 
   return (
@@ -51,69 +59,47 @@ const Header = () => {
           </form>
 
           <div className="header-actions">
-            {user?.role === 'admin' && (
-              <Link to="/admin" className="header-link header-link-admin">
-                <Shield size={20} />
-                <span>Panel Administrador</span>
-              </Link>
-            )}
-            {user?.role === 'specialist' && (
-              <Link to="/especialista/panel" className="header-link header-link-specialist">
-                <LayoutDashboard size={20} />
-                <span>Panel Especialista</span>
-              </Link>
-            )}
-            <Link to="/citas-pendientes" className="header-link header-link-citas">
-              <Calendar size={20} />
-              <span>Mis Citas</span>
-            </Link>
-
             {user ? (
               <div className="user-menu-container">
                 <button
                   className="user-menu-button"
-                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  onClick={toggleUserMenu}
                 >
-                  {user.picture ? (
-                    <img 
-                      src={`${process.env.REACT_APP_API_URL}/Uploads/${user.picture}`} 
-                      alt={user.name || 'Usuario'} 
-                      className="user-avatar" 
-                    />
-                  ) : (
-                    <div className="user-avatar-placeholder">
-                      <User size={20} />
-                    </div>
-                  )}
-                  <span className="user-name">
-                    {user.name ? user.name.split(' ')[0] : 'Usuario'}
-                  </span>
+                  <Menu size={20} />
+                  <span className="user-name">Menú</span>
                   <ChevronDown size={16} />
                 </button>
 
                 {showUserMenu && (
                   <div className="user-dropdown">
-                    <Link to="/perfil" className="dropdown-item" onClick={() => setShowUserMenu(false)}>
+                    <div className="dropdown-header">
+                      <span className="dropdown-welcome">Hola, {user.name?.split(' ')[0] || 'Usuario'}</span>
+                      <button className="dropdown-close" onClick={closeMenu}>
+                        <X size={18} />
+                      </button>
+                    </div>
+                    <Link to="/perfil" className="dropdown-item" onClick={closeMenu}>
                       <User size={18} />
                       <span>Mi Perfil</span>
                     </Link>
-                    <Link to="/citas-pendientes" className="dropdown-item" onClick={() => setShowUserMenu(false)}>
+                    <Link to="/citas-pendientes" className="dropdown-item" onClick={closeMenu}>
                       <Calendar size={18} />
                       <span>Mis Citas</span>
                     </Link>
-                    {user.role === 'admin' && (
-                      <Link to="/admin" className="dropdown-item" onClick={() => setShowUserMenu(false)}>
-                        <Shield size={18} />
-                        <span>Panel Administrador</span>
-                      </Link>
-                    )}
                     {user.role === 'specialist' && (
-                      <Link to="/especialista/panel" className="dropdown-item" onClick={() => setShowUserMenu(false)}>
+                      <Link to="/especialista/panel" className="dropdown-item" onClick={closeMenu}>
                         <LayoutDashboard size={18} />
                         <span>Panel Especialista</span>
                       </Link>
                     )}
-                    <button className="dropdown-item" onClick={handleLogout}>
+                    {user.role === 'admin' && (
+                      <Link to="/admin" className="dropdown-item" onClick={closeMenu}>
+                        <Shield size={18} />
+                        <span>Panel Administrador</span>
+                      </Link>
+                    )}
+                    <div className="dropdown-divider" />
+                    <button className="dropdown-item dropdown-item-logout" onClick={handleLogout}>
                       <LogOut size={18} />
                       <span>Cerrar Sesión</span>
                     </button>

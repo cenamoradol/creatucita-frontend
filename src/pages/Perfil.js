@@ -36,6 +36,9 @@ const Perfil = () => {
   const [applyError, setApplyError] = useState('');
   const [applicationStatus, setApplicationStatus] = useState(null);
 
+  const [userProfile, setUserProfile] = useState(null);
+  const [appointments, setAppointments] = useState({ pending: [], completed: [] });
+
   useEffect(() => {
     if (user) {
       const historialGuardado = localStorage.getItem(`historial_medico_${user.email}`);
@@ -43,15 +46,33 @@ const Perfil = () => {
         setHistorialMedico(JSON.parse(historialGuardado));
       }
 
-      // Fetch specialist application status
+      const token = user.access_token;
+
+      Promise.all([
+        fetch(`${API_URL}/users/${user.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(res => res.json()),
+        fetch(`${API_URL}/appointments/my-appointments`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(res => res.json())
+      ])
+      .then(([userData, appointmentsData]) => {
+        setUserProfile(userData);
+        if (Array.isArray(appointmentsData)) {
+          const pending = appointmentsData.filter(a => a.status === 'pending' || a.status === 'confirmed');
+          const completed = appointmentsData.filter(a => a.status === 'completed');
+          setAppointments({ pending, completed });
+        }
+      })
+      .catch(err => console.error('Error fetching data:', err));
+
       fetch(`${API_URL}/specialists/my-application`, {
-        headers: { 'Authorization': `Bearer ${user.access_token}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.json())
       .then(data => {
         if (data && data.status) {
           setApplicationStatus(data.status);
-          // Pre-fill form if they already have an application
           setApplyData(prev => ({
             ...prev,
             rtn: data.rtn || '',
@@ -187,9 +208,8 @@ const Perfil = () => {
 
   const avatarSrc = user.picture ? `${API_URL}/Uploads/${user.picture}` : user_picture;
 
-// Conectar con backend (Pendiente)
-  const citasPendientes = user.citasPendientes || 0;
-  const citasCompletadas = user.citasCompletadas || 0;
+  const citasPendientes = appointments.pending.length;
+  const citasCompletadas = appointments.completed.length;
   const serviciosFavoritos = user.serviciosFavoritos || [];
 
   return (
@@ -202,7 +222,7 @@ const Perfil = () => {
               <h1 className="perfil-nombre">{user.name}</h1>
               <p className="perfil-fecha">
                 <Calendar size={16} />
-                Miembro desde {new Date(user.date_created).toLocaleDateString('es-HN', { month: 'long', year: 'numeric' })}
+                Miembro desde {userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString('es-HN', { month: 'long', year: 'numeric' }) : 'Cargando...'}
               </p>
             </div>
           </div>
@@ -237,7 +257,7 @@ const Perfil = () => {
                 <MapPin size={18} />
                 <div>
                   <p className="info-label">Ubicación</p>
-                  <p className="info-value">{user.location}</p>
+                  <p className="info-value">{userProfile?.locationCity ? `${userProfile.locationCity}, ${userProfile.locationCountry || 'Honduras'}` : 'No especificada'}</p>
                 </div>
               </div>
             </div>

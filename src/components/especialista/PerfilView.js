@@ -185,7 +185,7 @@ const PerfilView = ({ especialista, token, appointments = [], onUpdate }) => {
               </div>
               <div className="info-content">
                 <label>Correo Electrónico</label>
-                <p>{especialista?.email || 'No especificado'}</p>
+                <p>{especialista?.user?.email || 'No especificado'}</p>
                 <small className="info-note">No editable</small>
               </div>
             </div>
