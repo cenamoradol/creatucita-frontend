@@ -76,12 +76,25 @@ const AgendarCita = () => {
       setLoading(false);
       return;
     }
-    
+
     const fetchEspecialista = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/specialists/${id}`);
         const spec = response.data;
-        
+
+        // Also fetch booking-info to get appointmentDuration and minAdvanceBooking
+        let appointmentDuration = 30;
+        let minAdvanceBooking = 4;
+        try {
+          const bookingRes = await axios.get(`${process.env.REACT_APP_API_URL}/specialists/${id}/booking-info`);
+          if (bookingRes.data) {
+            appointmentDuration = bookingRes.data.appointmentDuration || 30;
+            minAdvanceBooking = bookingRes.data.minAdvanceBooking || 4;
+          }
+        } catch (e) {
+          console.warn('Could not load booking-info, using defaults');
+        }
+
         const mappedServicio = {
           especialistaid: spec.id,
           especialista_name: spec.user?.name || 'Especialista',
@@ -94,28 +107,29 @@ const AgendarCita = () => {
           imagenes: [spec.user?.picture ? `/Uploads/${spec.user.picture}` : null].filter(Boolean),
           descripcion: spec.bio || 'Sin descripción.',
           schedules: spec.schedules || [],
-          offeredServices: spec.offeredServices || []
+          offeredServices: spec.offeredServices || [],
+          appointmentDuration,
+          minAdvanceBooking,
         };
 
         setServicio(mappedServicio);
-        
+
         // Auto-seleccionar el primer servicio si solo hay uno
         if (spec.offeredServices && spec.offeredServices.length === 1) {
           setSelectedService(spec.offeredServices[0]);
         }
-        
+
         // Procesar días disponibles
         const diasDisponibles = processAvailableDays(spec.schedules);
         setAvailableDays(diasDisponibles);
-        
-        setLoading(false);
+
       } catch (err) {
-        console.error('Error al obtener especialista:', err);
-        setError('Error al cargar la información del especialista');
+        console.error('Error al cargar especialista:', err);
+        setError('No se pudo cargar la información del especialista');
         setLoading(false);
       }
     };
-    
+
     fetchEspecialista();
   }, [id]);
 
@@ -196,11 +210,22 @@ const AgendarCita = () => {
 
   const isPastDate = (dayObj) => {
     if (!dayObj) return false;
-    
+
     const selectedDate = new Date(currentYear, currentMonth, dayObj.day);
     selectedDate.setHours(0, 0, 0, 0);
-    
+
     return selectedDate < today;
+  };
+
+  // Check if a day has enough advance time per specialist's minAdvanceBooking
+  const isBeforeAdvanceDate = (dayObj) => {
+    if (!dayObj || !servicio) return false;
+    const hours = servicio.minAdvanceBooking || 4;
+    const minDate = new Date();
+    minDate.setHours(minDate.getHours() + hours);
+    const selectedDate = new Date(currentYear, currentMonth, dayObj.day);
+    selectedDate.setHours(0, 0, 0, 0);
+    return selectedDate < new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
   };
 
   const isPastMonth = () => {
@@ -239,34 +264,36 @@ const AgendarCita = () => {
       
       // Verificar si el día es pasado
       const isPast = isPastDate({ day });
-      
+      // Verificar si no tiene suficiente anticipación
+      const isBeforeAdvance = isBeforeAdvanceDate({ day });
+
       // Si monthAvailability ya cargó para esta fecha, usarlo para refinar
       // Si aún no cargó (undefined), dejar el día disponible según el horario del especialista
       const dateKey = date.toISOString().split('T')[0];
       if (monthAvailability[dateKey] === false) {
         isAvailable = false; // Solo bloquear si sabemos con certeza que no hay slots
       }
-      const isSelectable = isAvailable && !isPast;
-      
+      const isSelectable = isAvailable && !isPast && !isBeforeAdvance;
+
       // Mapeo para mostrar al usuario (ajustado para Lunes=0)
       const displayNamesAdjusted = {
         0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
         4: 'Viernes', 5: 'Sábado', 6: 'Domingo'
       };
-      
+
       const dayNameSpanish = displayNamesAdjusted[adjustedDayOfWeek];
-      
+
       const dayObj = {
         day,
         date: date.toISOString().split('T')[0],
         isAvailable,
-        isPast, 
-        isSelectable, 
-        jsDayOfWeek, 
+        isPast,
+        isSelectable,
+        jsDayOfWeek,
         adjustedDayOfWeek,
         dayOfWeekSpanish: dayNameSpanish,
         isToday: date.toDateString() === today.toDateString()
-      };      
+      };
       days.push(dayObj);
     }
     
@@ -662,6 +689,20 @@ const AgendarCita = () => {
               <p className="location">
                 {servicio.especialista_ciudad}, {servicio.especialista_pais}
               </p>
+              <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+                {servicio.appointmentDuration ? (
+                  <span style={{ fontSize: 11, backgroundColor: '#dbeafe', color: '#1e40af', padding: '4px 10px', borderRadius: 12, fontWeight: 600 }}>
+                    Citas de {servicio.appointmentDuration} min
+                  </span>
+                ) : null}
+                {servicio.minAdvanceBooking ? (
+                  <span style={{ fontSize: 11, backgroundColor: '#fef3c7', color: '#92400e', padding: '4px 10px', borderRadius: 12, fontWeight: 600 }}>
+                    {servicio.minAdvanceBooking >= 24
+                      ? `Reservar con ${servicio.minAdvanceBooking / 24} día(s)`
+                      : `Reservar con ${servicio.minAdvanceBooking}h de anticipación`}
+                  </span>
+                ) : null}
+              </div>
             </div>
           </div>
           

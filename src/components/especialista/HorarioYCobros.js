@@ -32,6 +32,10 @@ const HorarioYCobros = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Appointment settings
+  const [appointmentDuration, setAppointmentDuration] = useState(30); // minutes (15, 30, 45, 60)
+  const [minAdvanceBooking, setMinAdvanceBooking] = useState(4); // hours (1, 2, 4, 24)
+
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
 
   const dias = [
@@ -114,6 +118,11 @@ const HorarioYCobros = () => {
         if (!resp.ok) throw new Error('No se pudo obtener el perfil de especialista');
         const profile = await resp.json();
         setSpecialistId(profile.id);
+
+        // Load duration and anticipation from profile
+        if (profile.appointmentDuration) setAppointmentDuration(profile.appointmentDuration);
+        if (profile.minAdvanceBooking) setMinAdvanceBooking(profile.minAdvanceBooking);
+
         await Promise.all([fetchHorarios(profile.id), fetchServicios(profile.id)]);
       } catch (err) {
         setError(err.message);
@@ -146,7 +155,7 @@ const HorarioYCobros = () => {
     if (!specialistId) return;
     try {
       const diasMap = { domingo: 0, lunes: 1, martes: 2, miercoles: 3, jueves: 4, viernes: 5, sabado: 6 };
-      
+
       const schedulesArray = [];
       Object.keys(horarios).forEach(dia => {
         if (horarios[dia].activo) {
@@ -158,6 +167,7 @@ const HorarioYCobros = () => {
         }
       });
 
+      // Save schedules
       const response = await fetch(`${API_URL}/schedules/bulk`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -167,9 +177,24 @@ const HorarioYCobros = () => {
         const errBody = await response.text();
         throw new Error(`Error al guardar horarios: ${errBody}`);
       }
+
+      // Save duration and anticipation to specialist profile
+      const profileRes = await fetch(`${API_URL}/specialists/profile`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appointmentDuration,
+          minAdvanceBooking,
+        })
+      });
+      if (!profileRes.ok) {
+        const errBody = await profileRes.text();
+        throw new Error(`Error al guardar configuración: ${errBody}`);
+      }
+
       setHorariosOriginal(JSON.parse(JSON.stringify(horarios)));
       setEditandoHorarios(false);
-      toast.success('Horarios guardados correctamente');
+      toast.success('Horarios y configuración guardados correctamente');
     } catch (err) {
       toast.error(err.message);
       setError(err.message);
@@ -327,6 +352,76 @@ const HorarioYCobros = () => {
               </div>
             ))}
           </div>
+
+          {/* Appointment duration and anticipation settings */}
+          <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#1f2937', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Clock size={16} /> Configuración de citas
+            </div>
+
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', marginBottom: '6px', letterSpacing: '0.5px' }}>
+                Duración de cada cita
+              </label>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {[15, 30, 45, 60].map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => editandoHorarios && setAppointmentDuration(d)}
+                    disabled={!editandoHorarios}
+                    style={{
+                      padding: '8px 14px',
+                      borderRadius: '20px',
+                      border: 'none',
+                      cursor: editandoHorarios ? 'pointer' : 'not-allowed',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      backgroundColor: appointmentDuration === d ? '#10b981' : '#fff',
+                      color: appointmentDuration === d ? '#fff' : '#374151',
+                      border: '1px solid ' + (appointmentDuration === d ? '#10b981' : '#d1d5db'),
+                    }}
+                  >
+                    {d} min
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', marginBottom: '6px', letterSpacing: '0.5px' }}>
+                Anticipación mínima para reservar
+              </label>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {[
+                  { value: 1, label: '1 hora' },
+                  { value: 2, label: '2 horas' },
+                  { value: 4, label: '4 horas' },
+                  { value: 24, label: '1 día' },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => editandoHorarios && setMinAdvanceBooking(opt.value)}
+                    disabled={!editandoHorarios}
+                    style={{
+                      padding: '8px 14px',
+                      borderRadius: '20px',
+                      border: 'none',
+                      cursor: editandoHorarios ? 'pointer' : 'not-allowed',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      backgroundColor: minAdvanceBooking === opt.value ? '#10b981' : '#fff',
+                      color: minAdvanceBooking === opt.value ? '#fff' : '#374151',
+                      border: '1px solid ' + (minAdvanceBooking === opt.value ? '#10b981' : '#d1d5db'),
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="servicios-section">
@@ -448,16 +543,16 @@ const HorarioYCobros = () => {
             <div className="resumen-value">{Object.values(horarios).filter(h => h.activo).length} / 7</div>
           </div>
           <div className="resumen-card">
-            <div className="resumen-label">Servicios Ofrecidos</div>
-            <div className="resumen-value">{servicios.length}</div>
+            <div className="resumen-label">Duración Cita</div>
+            <div className="resumen-value">{appointmentDuration} min</div>
           </div>
           <div className="resumen-card">
-            <div className="resumen-label">Precio Promedio</div>
-            <div className="resumen-value">
-              ${servicios.length > 0 
-                ? (servicios.reduce((sum, s) => sum + (s.precio ?? 0), 0) / servicios.length).toFixed(0) 
-                : 0}
-            </div>
+            <div className="resumen-label">Anticipación</div>
+            <div className="resumen-value">{minAdvanceBooking >= 24 ? `${minAdvanceBooking / 24}d` : `${minAdvanceBooking}h`}</div>
+          </div>
+          <div className="resumen-card">
+            <div className="resumen-label">Servicios Ofrecidos</div>
+            <div className="resumen-value">{servicios.length}</div>
           </div>
         </div>
       </div>

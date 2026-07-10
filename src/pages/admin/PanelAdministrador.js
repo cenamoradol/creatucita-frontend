@@ -58,8 +58,7 @@ const PanelAdministrador = () => {
   
   const [categoryForm, setCategoryForm] = useState({
     name: '',
-    description: '',
-    image: ''
+    description: ''
   });
   
   const [subcategoryForm, setSubcategoryForm] = useState({
@@ -240,7 +239,7 @@ const PanelAdministrador = () => {
       
       if (response.ok) {
         setShowCategoryModal(false);
-        setCategoryForm({ name: '', description: '', image: '' });
+        setCategoryForm({ name: '', description: '' });
         fetchData();
       }
     } catch (error) {
@@ -321,7 +320,7 @@ const PanelAdministrador = () => {
   };
 
   const openEditCategory = (cat) => {
-    setCategoryForm({ name: cat.name, description: cat.description || '', image: cat.image || '' });
+    setCategoryForm({ name: cat.name, description: cat.description || '' });
     setEditingCategory(cat);
     setShowCategoryModal(true);
   };
@@ -591,7 +590,6 @@ const PanelAdministrador = () => {
             <form onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory}>
               <input type="text" placeholder="Nombre" value={categoryForm.name} onChange={e => setCategoryForm({...categoryForm, name: e.target.value})} required />
               <textarea placeholder="Descripción" value={categoryForm.description} onChange={e => setCategoryForm({...categoryForm, description: e.target.value})} />
-              <input type="text" placeholder="URL de imagen" value={categoryForm.image} onChange={e => setCategoryForm({...categoryForm, image: e.target.value})} />
               <div className="modal-actions">
                 <button type="button" className="btn-secondary" onClick={() => setShowCategoryModal(false)}>Cancelar</button>
                 <button type="submit" className="btn-primary">{editingCategory ? 'Actualizar' : 'Crear'}</button>
