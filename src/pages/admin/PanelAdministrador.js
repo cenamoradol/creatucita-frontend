@@ -62,8 +62,7 @@ const PanelAdministrador = () => {
   });
   
   const [subcategoryForm, setSubcategoryForm] = useState({
-    name: '',
-    description: ''
+    name: ''
   });
 
   useEffect(() => {
@@ -287,7 +286,7 @@ const PanelAdministrador = () => {
       
       if (response.ok) {
         setShowSubcategoryModal(false);
-        setSubcategoryForm({ name: '', description: '' });
+        setSubcategoryForm({ name: '' });
         fetchData();
       }
     } catch (error) {
@@ -606,7 +605,6 @@ const PanelAdministrador = () => {
             <h3>Nueva Subcategoría</h3>
             <form onSubmit={handleCreateSubcategory}>
               <input type="text" placeholder="Nombre" value={subcategoryForm.name} onChange={e => setSubcategoryForm({...subcategoryForm, name: e.target.value})} required />
-              <textarea placeholder="Descripción" value={subcategoryForm.description} onChange={e => setSubcategoryForm({...subcategoryForm, description: e.target.value})} />
               <div className="modal-actions">
                 <button type="button" className="btn-secondary" onClick={() => setShowSubcategoryModal(false)}>Cancelar</button>
                 <button type="submit" className="btn-primary">Crear</button>
