@@ -558,6 +558,18 @@
   text-align: center;
 }
 
+.dni-file-input {
+  padding: 10px !important;
+  border: 2px dashed #cbd5e0 !important;
+  background: white;
+  cursor: pointer;
+}
+
+.dni-file-hint {
+  font-size: 13px;
+  color: #007bff;
+}
+
 .apply-success {
   text-align: center;
   padding: 20px;

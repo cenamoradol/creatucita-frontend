@@ -26,11 +26,13 @@ const Perfil = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [applyData, setApplyData] = useState({
     rtn: '',
+    dni: '',
     clinicAddress: '',
     bio: '',
     phone: '',
     subcategoryIds: []
   });
+  const [dniFile, setDniFile] = useState(null);
   const [applying, setApplying] = useState(false);
   const [applySuccess, setApplySuccess] = useState(false);
   const [applyError, setApplyError] = useState('');
@@ -76,6 +78,7 @@ const Perfil = () => {
           setApplyData(prev => ({
             ...prev,
             rtn: data.rtn || '',
+            dni: data.dni || '',
             clinicAddress: data.clinicAddress || '',
             bio: data.bio || '',
             phone: data.phone || '',
@@ -122,16 +125,24 @@ const Perfil = () => {
     e.preventDefault();
     setApplying(true);
     setApplyError('');
-    
+
     try {
-      const token = localStorage.getItem('token') || ''; // We should probably store token better
+      const formData = new FormData();
+      Object.entries(applyData).forEach(([key, value]) => {
+        if (key === 'subcategoryIds') {
+          formData.append(key, value.join(','));
+        } else {
+          formData.append(key, value || '');
+        }
+      });
+      if (dniFile) formData.append('dniFile', dniFile);
+
       const res = await fetch(`${API_URL}/specialists/apply`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.access_token}` // Assuming user object has access_token from login
+        headers: {
+          'Authorization': `Bearer ${user.access_token}`
         },
-        body: JSON.stringify(applyData)
+        body: formData
       });
 
       const data = await res.json();
@@ -324,14 +335,39 @@ const Perfil = () => {
                     <>
                       <div className="form-group-apply">
                         <label>RTN (Identificación Tributaria)</label>
-                        <input 
-                          type="text" 
-                          name="rtn" 
-                          value={applyData.rtn} 
-                          onChange={handleApplyChange} 
+                        <input
+                          type="text"
+                          name="rtn"
+                          value={applyData.rtn}
+                          onChange={handleApplyChange}
                           placeholder="Ej: 0801-1990-123456"
-                          required 
+                          required
                         />
+                      </div>
+                      <div className="form-group-apply">
+                        <label>DNI (Número de Identidad)</label>
+                        <input
+                          type="text"
+                          name="dni"
+                          value={applyData.dni}
+                          onChange={handleApplyChange}
+                          placeholder="Ej: 0801-1990-12345"
+                          required
+                        />
+                      </div>
+                      <div className="form-group-apply">
+                        <label>Adjuntar DNI (foto o PDF, máx. 5MB)</label>
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          onChange={(e) => setDniFile(e.target.files[0] || null)}
+                          className="dni-file-input"
+                        />
+                        {dniFile && (
+                          <span className="dni-file-hint">
+                            Archivo seleccionado: {dniFile.name}
+                          </span>
+                        )}
                       </div>
                       <div className="form-group-apply">
                         <label>Dirección del Consultorio</label>
