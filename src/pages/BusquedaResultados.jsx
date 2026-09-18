@@ -67,7 +67,7 @@ const BusquedaResultados = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/specialists?${params.toString()}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/specialists?${params.toString()}`);
       if (!response.ok) throw new Error('Error en la respuesta');
       const data = await response.json();
       
@@ -230,7 +230,7 @@ const BusquedaResultados = () => {
                   <div className="resultado-imagen">
                     {resultado.foto ? (
                       <img 
-                        src={`${process.env.REACT_APP_API_URL}${resultado.foto}`}
+                        src={`${import.meta.env.VITE_API_URL}${resultado.foto}`}
                         alt={resultado.nombre}
                         className="perfil-foto"
                       />

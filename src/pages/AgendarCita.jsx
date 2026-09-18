@@ -6,7 +6,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import toast from 'react-hot-toast';
 import './AgendarCita.css';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RnmpxQshHvC6Zy5Ei1JaVU6OejVuu9QnHL1MTccG7hdBmC6nEGgtGajAR1ZK4OsTBi1afjzgvfUzyfw78timoRx00ffkqrRqP');
+const stripePromise = loadStripe(process.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RnmpxQshHvC6Zy5Ei1JaVU6OejVuu9QnHL1MTccG7hdBmC6nEGgtGajAR1ZK4OsTBi1afjzgvfUzyfw78timoRx00ffkqrRqP');
 
 const AgendarCita = () => {
   const { id } = useParams();
@@ -79,14 +79,14 @@ const AgendarCita = () => {
 
     const fetchEspecialista = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/specialists/${id}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/specialists/${id}`);
         const spec = response.data;
 
         // Also fetch booking-info to get appointmentDuration and minAdvanceBooking
         let appointmentDuration = 30;
         let minAdvanceBooking = 4;
         try {
-          const bookingRes = await axios.get(`${process.env.REACT_APP_API_URL}/specialists/${id}/booking-info`);
+          const bookingRes = await axios.get(`${import.meta.env.VITE_API_URL}/specialists/${id}/booking-info`);
           if (bookingRes.data) {
             appointmentDuration = bookingRes.data.appointmentDuration || 30;
             minAdvanceBooking = bookingRes.data.minAdvanceBooking || 4;
@@ -327,7 +327,7 @@ const AgendarCita = () => {
         // Fetch en paralelo usando el nuevo backend
         const responses = await Promise.all(
           potentialDates.map(date =>
-            axios.get(`${process.env.REACT_APP_API_URL}/specialists/${servicio.especialistaid}/availability?date=${date}`)
+            axios.get(`${import.meta.env.VITE_API_URL}/specialists/${servicio.especialistaid}/availability?date=${date}`)
               .then(res => ({ date, hasAvailableSlots: res.data && res.data.length > 0 }))
               .catch(() => ({ date, hasAvailableSlots: false }))
           )
@@ -351,7 +351,7 @@ const AgendarCita = () => {
     if (selectedDate && servicio?.especialistaid) {      
       const fetchAvailableTimes = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/specialists/${servicio.especialistaid}/availability?date=${selectedDate}`);
+          const response = await axios.get(`${import.meta.env.VITE_API_URL}/specialists/${servicio.especialistaid}/availability?date=${selectedDate}`);
           
           // Mapear del formato [{start: "08:00:00", end: "08:30:00"}] a solo la hora de inicio en string para el select
           const times = response.data.map(slot => {
@@ -580,7 +580,7 @@ const AgendarCita = () => {
       setPaymentLoading(true);
       const token = user?.access_token || localStorage.getItem('token');
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/appointments`, 
+        `${import.meta.env.VITE_API_URL}/appointments`, 
         {
           specialistId: servicio.especialistaid,
           date: selectedDate,
@@ -676,7 +676,7 @@ const AgendarCita = () => {
         <div className="especialista-info">
           <div className="especialista-header">
             <img 
-              src={`${process.env.REACT_APP_API_URL}${servicio.especialista_picture}`} 
+              src={`${import.meta.env.VITE_API_URL}${servicio.especialista_picture}`} 
               alt={servicio.especialista_name}
               className="especialista-picture"
               onError={(e) => {
@@ -723,7 +723,7 @@ const AgendarCita = () => {
                     onClick={() => openImageModal(image, index)}
                   >
                     <img 
-                      src={`${process.env.REACT_APP_API_URL}${image}`}
+                      src={`${import.meta.env.VITE_API_URL}${image}`}
                       alt={`Imagen ${index + 1}`}
                       className="imagen-adicional"
                       onError={(e) => {
@@ -1007,7 +1007,7 @@ const AgendarCita = () => {
             
             <div className="modal-image-container">
               <img 
-                src={`${process.env.REACT_APP_API_URL}${imageModal.currentImage}`}
+                src={`${import.meta.env.VITE_API_URL}${imageModal.currentImage}`}
                 alt="Imagen en detalle"
                 className="modal-image"
                 onError={(e) => {

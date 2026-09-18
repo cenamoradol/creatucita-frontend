@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Archive, ArchiveRestore, Trash2, Search } from 'lucide-react';
 import './NotasArchivadas.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 const NotasArchivadas = ({ notas = [], token, onRestoreNote, onDeleteNote }) => {
   const [searchTerm, setSearchTerm] = useState('');

@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import './CitasPendientes.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 const CitasPendientes = () => {
   const { user, loading: authLoading } = useAuth();

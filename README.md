@@ -1,6 +1,6 @@
 # CreaTuCita - Frontend
 
-Aplicacion web para la gestion de citas medicas, construida con **React** y **React Router**.
+Aplicacion web para la gestion de citas medicas, construida con **React** + **Vite** y **React Router**.
 
 ## Requisitos
 
@@ -28,7 +28,8 @@ npm install
 Crea un archivo `.env` en la raiz del proyecto:
 
 ```env
-REACT_APP_API_URL=http://localhost:3002
+VITE_API_URL=http://localhost:3002
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
 ```
 
 ### 4. Iniciar el servidor de desarrollo
@@ -37,7 +38,7 @@ REACT_APP_API_URL=http://localhost:3002
 npm start
 ```
 
-La aplicacion estara disponible en `http://localhost:3000`.
+La aplicacion estara disponible en `http://localhost:5173`.
 
 ### 5. Compilar para produccion
 
@@ -45,7 +46,7 @@ La aplicacion estara disponible en `http://localhost:3000`.
 npm run build
 ```
 
-Los archivos compilados se generan en la carpeta `build/`.
+Los archivos compilados se generan en la carpeta `dist/`.
 
 ## Estructura del proyecto
 

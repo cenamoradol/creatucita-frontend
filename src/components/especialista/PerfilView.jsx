@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Briefcase, Edit3, Save, X, Camera, Trash2 } from 'lucide-react';
 import './PerfilView.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 const PerfilView = ({ especialista, token, appointments = [], onUpdate }) => {
   const [loading, setLoading] = useState(false);

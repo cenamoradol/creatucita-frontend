@@ -54,7 +54,7 @@ export const AuthProviderEspecialista = ({ children }) => {
 
     if (!especialistaData.servicios && especialistaData.especialistaid) {
       try {
-        const servicesResponse = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/especialista/services`, {
+        const servicesResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/especialista/services`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

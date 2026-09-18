@@ -80,7 +80,7 @@ const CalendarioView = () => {
         setLoading(true);
         setError(null);
 
-        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
         const res = await fetch(
           `${API_URL}/appointments/specialist/upcoming`,
           {
@@ -198,7 +198,7 @@ const CalendarioView = () => {
         notas: newAppointment.notes || ''
       };
 
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
       const res = await fetch(
         `${API_URL}/appointments/specialist/create`,
         {
@@ -255,7 +255,7 @@ const CalendarioView = () => {
         return;
       }
 
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
       const res = await fetch(
         `${API_URL}/appointments/${aptId}/status`,
         {

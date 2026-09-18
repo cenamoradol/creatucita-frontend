@@ -5,7 +5,7 @@ import { User, Mail, Phone, MapPin, Calendar, Award, Heart, LogOut, FileText, Pl
 import user_picture from '../assets/avatar-user.png'
 import './Perfil.css';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Perfil = () => {
   const { user, logout } = useAuth();

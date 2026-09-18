@@ -13,7 +13,7 @@ const VerifyEmail = () => {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/verify/${verification_token}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify/${verification_token}`);
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || 'Error en la verificación');

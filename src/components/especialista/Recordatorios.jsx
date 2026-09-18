@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Save, X, Check, Clock, AlertCircle, Calendar } from 'lucide-react';
 import './Recordatorios.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 const Recordatorios = ({ recordatorios = [], appointments = [], token, onAddRecordatorio, onToggleRecordatorio }) => {
   const [showForm, setShowForm] = useState(false);

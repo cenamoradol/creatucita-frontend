@@ -62,7 +62,7 @@ const Login = () => {
     if (isLogin) {
       // Login
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: formData.email, password: formData.password })
@@ -85,7 +85,7 @@ const Login = () => {
       const telephone = `${formData.codigoPais}${formData.telefono}`;
 
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/register`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

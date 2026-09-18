@@ -14,7 +14,7 @@ const Notas = ({ notas = [], token, onAddNote, onUpdateNote, onArchiveNote, onDe
   });
   const [error, setError] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
   const handleSubmit = async (e) => {
     e.preventDefault();

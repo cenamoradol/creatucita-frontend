@@ -20,7 +20,7 @@ const CitasView = () => {
     }
 
     try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
       const response = await fetch(`${API_URL}/appointments/specialist/upcoming`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -61,7 +61,7 @@ const CitasView = () => {
         throw new Error('Estado inválido');
       }
 
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
       const response = await fetch(`${API_URL}/appointments/${id}/status`, {
         method: 'PATCH',
         headers: {

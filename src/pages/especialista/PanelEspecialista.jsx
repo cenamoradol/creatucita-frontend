@@ -52,7 +52,7 @@ const PanelEspecialista = () => {
           return;
         }
 
-        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
         const response = await fetch(`${API_URL}/specialists/dashboard`, {
           method: 'GET',
           headers: {
@@ -99,7 +99,7 @@ const PanelEspecialista = () => {
         const token = user?.access_token;
         if (!token) return;
 
-        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
         const response = await fetch(`${API_URL}/specialists/me`, {
           method: 'GET',
           headers: {

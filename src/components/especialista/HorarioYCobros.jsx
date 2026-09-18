@@ -36,7 +36,7 @@ const HorarioYCobros = () => {
   const [appointmentDuration, setAppointmentDuration] = useState(30); // minutes (15, 30, 45, 60)
   const [minAdvanceBooking, setMinAdvanceBooking] = useState(4); // hours (1, 2, 4, 24)
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
   const dias = [
     { key: 'lunes', nombre: 'Lunes' },
