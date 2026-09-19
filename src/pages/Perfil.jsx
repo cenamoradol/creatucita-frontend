@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Phone, MapPin, Calendar, Award, Heart, LogOut, FileText, Plus, X, Edit2, Check } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Award, Heart, LogOut, FileText, Plus, X, Edit2, Check, Camera } from 'lucide-react';
 import user_picture from '../assets/avatar-user.png'
 import './Perfil.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Perfil = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [historialMedico, setHistorialMedico] = useState({
     padecimientos: [],
@@ -40,6 +40,97 @@ const Perfil = () => {
 
   const [userProfile, setUserProfile] = useState(null);
   const [appointments, setAppointments] = useState({ pending: [], completed: [] });
+
+  // Estados para edición de perfil
+  const [editOpen, setEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', telephone: '', locationCountry: '', locationCity: '' });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const fileInputRef = useRef(null);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [editError, setEditError] = useState('');
+
+  const openEdit = () => {
+    setEditForm({
+      name: userProfile?.name || user?.name || '',
+      telephone: userProfile?.telephone || user?.telephone || '',
+      locationCountry: userProfile?.locationCountry || user?.locationCountry || 'Honduras',
+      locationCity: userProfile?.locationCity || user?.locationCity || '',
+    });
+    setAvatarFile(null);
+    setAvatarPreview(userProfile?.profilePicture || user?.profilePicture || null);
+    setEditError('');
+    setEditOpen(true);
+  };
+
+  const closeEdit = () => {
+    setEditOpen(false);
+    setAvatarFile(null);
+    setAvatarPreview(null);
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      setEditError('La imagen no puede pesar más de 3 MB');
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    setEditError('');
+    try {
+      const token = user.access_token;
+      const updated = await fetch(`${API_URL}/users/me`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          name: editForm.name.trim(),
+          telephone: editForm.telephone.trim() || undefined,
+          locationCountry: editForm.locationCountry.trim() || undefined,
+          locationCity: editForm.locationCity.trim() || undefined,
+        }),
+      }).then(async r => {
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(data.message || 'Error al guardar');
+        return data;
+      });
+
+      let pictureUrl = updated.profilePicture || userProfile?.profilePicture;
+      if (avatarFile) {
+        const fd = new FormData();
+        fd.append('avatar', avatarFile);
+        const r = await fetch(`${API_URL}/users/me/avatar`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(data.message || 'Error al subir la foto');
+        pictureUrl = data.profilePicture;
+      }
+
+      const nextProfile = { ...(userProfile || {}), ...updated, profilePicture: pictureUrl };
+      setUserProfile(nextProfile);
+      updateUser({
+        name: nextProfile.name,
+        telephone: nextProfile.telephone,
+        locationCountry: nextProfile.locationCountry,
+        locationCity: nextProfile.locationCity,
+        profilePicture: pictureUrl,
+      });
+      closeEdit();
+    } catch (err) {
+      setEditError(err.message);
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -217,7 +308,7 @@ const Perfil = () => {
     setAgregando(null);
   };
 
-  const avatarSrc = user.picture ? `${API_URL}/Uploads/${user.picture}` : user_picture;
+  const avatarSrc = (userProfile?.profilePicture || user?.profilePicture) || (user.picture ? `${API_URL}/Uploads/${user.picture}` : user_picture);
 
   const citasPendientes = appointments.pending.length;
   const citasCompletadas = appointments.completed.length;
@@ -240,6 +331,13 @@ const Perfil = () => {
           <button onClick={handleLogout} className="logout-button">
             <LogOut size={18} />
             Cerrar Sesión
+          </button>
+        </div>
+
+        <div className="perfil-actions">
+          <button onClick={openEdit} className="edit-profile-button">
+            <Edit2 size={18} />
+            Editar Perfil
           </button>
         </div>
 
@@ -569,6 +667,105 @@ const Perfil = () => {
           </div>
         </div>
       </div>
+
+      {editOpen && (
+        <div className="edit-modal-overlay" onClick={closeEdit}>
+          <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="edit-modal-header">
+              <h2>Editar Perfil</h2>
+              <button onClick={closeEdit} className="edit-modal-close"><X size={20} /></button>
+            </div>
+            <form onSubmit={handleSaveProfile} className="edit-form">
+              <div className="edit-avatar-section">
+                <label
+                  htmlFor="avatar-input"
+                  className="edit-avatar-label"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fileInputRef.current?.click();
+                  }}
+                >
+                  <img src={avatarPreview || avatarSrc} alt="avatar" className="edit-avatar-preview" />
+                  <span className="edit-avatar-overlay">
+                    <Camera size={20} />
+                    Cambiar foto
+                  </span>
+                </label>
+                <input
+                  ref={fileInputRef}
+                  id="avatar-input"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleAvatarChange}
+                  style={{ display: 'none' }}
+                />
+                <p className="edit-avatar-hint">JPG, PNG, WEBP o GIF. Máximo 3 MB.</p>
+              </div>
+
+              <div className="edit-field">
+                <label>Correo Electrónico</label>
+                <input type="email" value={user?.email || ''} disabled />
+                <p className="edit-field-hint">El correo no se puede cambiar.</p>
+              </div>
+
+              <div className="edit-field">
+                <label>Nombre completo</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm(f => ({ ...f, name: e.target.value }))}
+                  required
+                  maxLength={120}
+                />
+              </div>
+
+              <div className="edit-field">
+                <label>Teléfono</label>
+                <input
+                  type="tel"
+                  value={editForm.telephone}
+                  onChange={(e) => setEditForm(f => ({ ...f, telephone: e.target.value }))}
+                  placeholder="+504 9999-9999"
+                  maxLength={30}
+                />
+              </div>
+
+              <div className="edit-field-row">
+                <div className="edit-field">
+                  <label>País</label>
+                  <input
+                    type="text"
+                    value={editForm.locationCountry}
+                    onChange={(e) => setEditForm(f => ({ ...f, locationCountry: e.target.value }))}
+                    maxLength={80}
+                  />
+                </div>
+                <div className="edit-field">
+                  <label>Ciudad</label>
+                  <input
+                    type="text"
+                    value={editForm.locationCity}
+                    onChange={(e) => setEditForm(f => ({ ...f, locationCity: e.target.value }))}
+                    maxLength={80}
+                  />
+                </div>
+              </div>
+
+              {editError && <p className="edit-error">{editError}</p>}
+
+              <div className="edit-modal-actions">
+                <button type="button" onClick={closeEdit} className="btn-cancelar" disabled={savingProfile}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-guardar" disabled={savingProfile}>
+                  <Check size={18} />
+                  {savingProfile ? 'Guardando...' : 'Guardar cambios'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
