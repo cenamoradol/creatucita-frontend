@@ -373,7 +373,6 @@ const HorarioYCobros = () => {
                     style={{
                       padding: '8px 14px',
                       borderRadius: '20px',
-                      border: 'none',
                       cursor: editandoHorarios ? 'pointer' : 'not-allowed',
                       fontSize: '13px',
                       fontWeight: 600,
@@ -407,7 +406,6 @@ const HorarioYCobros = () => {
                     style={{
                       padding: '8px 14px',
                       borderRadius: '20px',
-                      border: 'none',
                       cursor: editandoHorarios ? 'pointer' : 'not-allowed',
                       fontSize: '13px',
                       fontWeight: 600,
