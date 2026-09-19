@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, Mail, Phone, MapPin, Briefcase, Edit3, Save, X, Camera, Trash2 } from 'lucide-react';
 import './PerfilView.css';
 
@@ -14,6 +14,10 @@ const PerfilView = ({ especialista, token, appointments = [], onUpdate }) => {
     bio: ''
   });
   const [saving, setSaving] = useState(false);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
 
   const buildImageUrl = (imagePath) => {
     if (!imagePath) return null;
@@ -108,6 +112,45 @@ const PerfilView = ({ especialista, token, appointments = [], onUpdate }) => {
     }));
   };
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      setError('La imagen no puede pesar más de 3 MB');
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!avatarFile || !token) return;
+    setUploadingAvatar(true);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.append('avatar', avatarFile);
+      const r = await fetch(`${API_URL}/specialists/me/avatar`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.message || 'Error al subir la foto');
+      const newUrl = data.profilePicture;
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (onUpdate) {
+        onUpdate({ ...especialista, profilePicture: newUrl });
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const completedAppointments = appointments.filter(a => a.status === 'completed').length;
   const totalAppointments = appointments.length;
 
@@ -115,17 +158,26 @@ const PerfilView = ({ especialista, token, appointments = [], onUpdate }) => {
     return <div className="loading">Cargando perfil...</div>;
   }
 
-  const pictureUrl = especialista?.picture ? buildImageUrl(especialista.picture) : null;
+  const pictureUrl = avatarPreview
+    || (especialista?.profilePicture ? buildImageUrl(especialista.profilePicture) : null);
 
   return (
     <div className="perfil-view">
       <div className="perfil-header-card">
         <div className="perfil-avatar-container">
-          <div className={`perfil-avatar-large ${pictureUrl ? 'with-image' : ''}`}>
+          <label
+            htmlFor="specialist-avatar-input"
+            className="perfil-avatar-large"
+            style={{ cursor: 'pointer' }}
+            onClick={(e) => {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }}
+          >
             {pictureUrl ? (
-              <img 
-                src={pictureUrl} 
-                alt="Foto de perfil" 
+              <img
+                src={pictureUrl}
+                alt="Foto de perfil"
                 className="perfil-avatar-image"
                 onError={(e) => {
                   e.target.style.display = 'none';
@@ -134,7 +186,28 @@ const PerfilView = ({ especialista, token, appointments = [], onUpdate }) => {
             ) : (
               <User size={64} />
             )}
-          </div>
+            <span className="upload-overlay" title="Cambiar foto">
+              <Camera size={20} />
+            </span>
+          </label>
+          <input
+            ref={fileInputRef}
+            id="specialist-avatar-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={handleAvatarChange}
+            style={{ display: 'none' }}
+          />
+          {avatarFile && (
+            <button
+              type="button"
+              className="upload-button"
+              onClick={handleAvatarUpload}
+              disabled={uploadingAvatar}
+            >
+              {uploadingAvatar ? 'Subiendo...' : <><Camera size={16} /> Guardar foto</>}
+            </button>
+          )}
         </div>
         <div className="perfil-header-info">
           <h2>{especialista?.user?.name || especialista?.name || 'Especialista'}</h2>
