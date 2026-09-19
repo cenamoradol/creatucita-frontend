@@ -83,7 +83,7 @@ const BusquedaResultados = () => {
         return {
           id: spec.id,
           nombre: spec.user ? spec.user.name : 'Usuario',
-          foto: spec.user && spec.user.picture ? `/Uploads/${spec.user.picture}` : null,
+          foto: spec.profilePicture || (spec.user && spec.user.profilePicture) || null,
           categoria: categoryName,
           servicio: subcategoriesList,
           ciudad: spec.clinicAddress || 'Ubicación no especificada',
@@ -229,8 +229,8 @@ const BusquedaResultados = () => {
                 <div key={resultado.id} className="resultado-card">
                   <div className="resultado-imagen">
                     {resultado.foto ? (
-                      <img 
-                        src={`${import.meta.env.VITE_API_URL}${resultado.foto}`}
+                      <img
+                        src={resultado.foto.startsWith('http') ? resultado.foto : `${import.meta.env.VITE_API_URL}${resultado.foto}`}
                         alt={resultado.nombre}
                         className="perfil-foto"
                       />

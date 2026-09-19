@@ -103,8 +103,8 @@ const AgendarCita = () => {
             : 'Especialista General',
           especialista_ciudad: spec.clinicAddress || 'No especificada',
           especialista_pais: spec.user?.location_country || '',
-          especialista_picture: spec.user?.picture ? `/Uploads/${spec.user.picture}` : null,
-          imagenes: [spec.user?.picture ? `/Uploads/${spec.user.picture}` : null].filter(Boolean),
+          especialista_picture: spec.profilePicture || spec.user?.profilePicture || null,
+          imagenes: [spec.profilePicture || spec.user?.profilePicture || null].filter(Boolean),
           descripcion: spec.bio || 'Sin descripción.',
           schedules: spec.schedules || [],
           offeredServices: spec.offeredServices || [],
@@ -123,6 +123,7 @@ const AgendarCita = () => {
         const diasDisponibles = processAvailableDays(spec.schedules);
         setAvailableDays(diasDisponibles);
 
+        setLoading(false);
       } catch (err) {
         console.error('Error al cargar especialista:', err);
         setError('No se pudo cargar la información del especialista');
@@ -675,8 +676,14 @@ const AgendarCita = () => {
       <div className="agendar-cita-content">
         <div className="especialista-info">
           <div className="especialista-header">
-            <img 
-              src={`${import.meta.env.VITE_API_URL}${servicio.especialista_picture}`} 
+            <img
+              src={
+                servicio.especialista_picture
+                  ? (servicio.especialista_picture.startsWith('http')
+                      ? servicio.especialista_picture
+                      : `${import.meta.env.VITE_API_URL}${servicio.especialista_picture}`)
+                  : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRadJ-YmNxJTg6v9iO22fzR_65KenYJHFB5zg&se'
+              }
               alt={servicio.especialista_name}
               className="especialista-picture"
               onError={(e) => {
@@ -722,8 +729,8 @@ const AgendarCita = () => {
                     className="imagen-wrapper"
                     onClick={() => openImageModal(image, index)}
                   >
-                    <img 
-                      src={`${import.meta.env.VITE_API_URL}${image}`}
+                    <img
+                      src={image.startsWith('http') ? image : `${import.meta.env.VITE_API_URL}${image}`}
                       alt={`Imagen ${index + 1}`}
                       className="imagen-adicional"
                       onError={(e) => {
@@ -1007,7 +1014,7 @@ const AgendarCita = () => {
             
             <div className="modal-image-container">
               <img 
-                src={`${import.meta.env.VITE_API_URL}${imageModal.currentImage}`}
+                src={imageModal.currentImage.startsWith('http') ? imageModal.currentImage : `${import.meta.env.VITE_API_URL}${imageModal.currentImage}`}
                 alt="Imagen en detalle"
                 className="modal-image"
                 onError={(e) => {
