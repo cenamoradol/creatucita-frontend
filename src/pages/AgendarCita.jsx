@@ -6,7 +6,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import toast from 'react-hot-toast';
 import './AgendarCita.css';
 
-const stripePromise = loadStripe(process.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RnmpxQshHvC6Zy5Ei1JaVU6OejVuu9QnHL1MTccG7hdBmC6nEGgtGajAR1ZK4OsTBi1afjzgvfUzyfw78timoRx00ffkqrRqP');
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RnmpxQshHvC6Zy5Ei1JaVU6OejVuu9QnHL1MTccG7hdBmC6nEGgtGajAR1ZK4OsTBi1afjzgvfUzyfw78timoRx00ffkqrRqP');
 
 const AgendarCita = () => {
   const { id } = useParams();

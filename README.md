@@ -98,7 +98,7 @@ src/
 
 ### Administrador
 - Email: `admin@creatucita.com`
-- Password: `Admin123@`
+- Password: `Admin123!`
 
 ### Especialista
 - Email: `isaaceverywere@gmail.com`
