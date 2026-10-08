@@ -1,122 +1,139 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, Calendar, LogOut, ChevronDown, LayoutDashboard, Shield, Menu, User, X } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import '../components/Header.css';
+import { useEffect, useState } from "react";
+import { Icon } from "@iconify/react";
+import { useScrolled } from "../hooks/useScrolled";
+import "./Header.css";
 
-const Header = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
+const NAV_LINKS = [
+  { href: "/#beneficios", label: "Beneficios" },
+  { href: "/#por-que", label: "Por qué" },
+  { href: "/#funcionalidades", label: "Funcionalidades" },
+  { href: "/#casos", label: "Casos de uso" },
+  { href: "/#testimonios", label: "Testimonios" },
+];
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/busqueda?q=${encodeURIComponent(searchTerm)}`);
-    }
-  };
+const MOBILE_NAV_LINKS = [
+  { href: "/#beneficios", label: "Beneficios" },
+  { href: "/#por-que", label: "Por qué CreaTuCita" },
+  { href: "/#funcionalidades", label: "Funcionalidades" },
+  { href: "/#casos", label: "Casos de uso" },
+  { href: "/#testimonios", label: "Testimonios" },
+];
 
-  const handleLogout = () => {
-    logout();
-    setShowUserMenu(false);
-    navigate('/');
-  };
+export default function Header() {
+  const scrolled = useScrolled(50);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const toggleUserMenu = () => {
-    setShowUserMenu(!showUserMenu);
-  };
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
-  const closeMenu = () => {
-    setShowUserMenu(false);
-  };
+  const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className="header">
-      <div className="header-container">
-        <div className="header-top">
-          <Link to="/" className="logo">
-            <div className="logo-text">
-              <span className="logo-title">CreaTuCita</span>
-              <span className="logo-subtitle">.com</span>
-            </div>
-          </Link>
-
-          <form className="search-bar" onSubmit={handleSearch}>
-            <div className="search-icon">
-              <Search size={20} />
-            </div>
-            <input
-              type="text"
-              placeholder="Buscar servicios profesionales..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
+    <>
+      <nav
+        id="navbar"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled ? "nav-scrolled" : ""
+        }`}
+      >
+        <div className="max-w-screen-2xl mx-auto px-6 h-20 flex items-center justify-between">
+          <a href="/" className="flex items-center">
+            <img
+              src="/img/Logotipo Header.png"
+              alt="CreaTuCita"
+              className="h-10 w-auto max-w-full object-contain"
             />
-            <button type="submit" className="search-button">
-              Buscar
+          </a>
+
+          <div className="hidden lg:flex items-center gap-8">
+            {NAV_LINKS.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="hidden lg:flex items-center gap-3">
+            <a
+              href="/#descargar"
+              className="btn-shine text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40"
+            >
+              Descargar App
+            </a>
+          </div>
+
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors"
+            aria-label="Menú"
+          >
+            <Icon icon="mdi:menu" className="text-2xl text-slate-700" />
+          </button>
+        </div>
+      </nav>
+
+      <div
+        id="mobileMenu"
+        className={`mobile-menu fixed top-0 right-0 bottom-0 w-80 max-w-full z-50 bg-white shadow-2xl ${
+          menuOpen ? "open" : ""
+        }`}
+      >
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-8">
+            <img
+              src="/img/Logotipo Header.png"
+              alt="CreaTuCita"
+              className="h-10 w-auto max-w-full object-contain"
+            />
+            <button
+              onClick={closeMenu}
+              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors"
+              aria-label="Cerrar menú"
+            >
+              <Icon icon="mdi:close" className="text-2xl text-slate-700" />
             </button>
-          </form>
+          </div>
 
-          <div className="header-actions">
-            {user ? (
-              <div className="user-menu-container">
-                <button
-                  className="user-menu-button"
-                  onClick={toggleUserMenu}
-                >
-                  <Menu size={20} />
-                  <span className="user-name">Menú</span>
-                  <ChevronDown size={16} />
-                </button>
+          <div className="flex flex-col gap-1">
+            {MOBILE_NAV_LINKS.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={closeMenu}
+                className="mobile-link px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium transition-colors"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
 
-                {showUserMenu && (
-                  <div className="user-dropdown">
-                    <div className="dropdown-header">
-                      <span className="dropdown-welcome">Hola, {user.name?.split(' ')[0] || 'Usuario'}</span>
-                      <button className="dropdown-close" onClick={closeMenu}>
-                        <X size={18} />
-                      </button>
-                    </div>
-                    <Link to="/perfil" className="dropdown-item" onClick={closeMenu}>
-                      <User size={18} />
-                      <span>Mi Perfil</span>
-                    </Link>
-                    <Link to="/citas-pendientes" className="dropdown-item" onClick={closeMenu}>
-                      <Calendar size={18} />
-                      <span>Mis Citas</span>
-                    </Link>
-                    {user.role === 'specialist' && (
-                      <Link to="/especialista/panel" className="dropdown-item" onClick={closeMenu}>
-                        <LayoutDashboard size={18} />
-                        <span>Panel Especialista</span>
-                      </Link>
-                    )}
-                    {user.role === 'admin' && (
-                      <Link to="/admin" className="dropdown-item" onClick={closeMenu}>
-                        <Shield size={18} />
-                        <span>Panel Administrador</span>
-                      </Link>
-                    )}
-                    <div className="dropdown-divider" />
-                    <button className="dropdown-item dropdown-item-logout" onClick={handleLogout}>
-                      <LogOut size={18} />
-                      <span>Cerrar Sesión</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link to="/login" className="header-link header-link-login">
-                <User size={20} />
-                <span>Ingresar</span>
-              </Link>
-            )}
+          <div className="mt-8 flex flex-col gap-3">
+            <a
+              href="/#descargar"
+              onClick={closeMenu}
+              className="text-center px-5 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-colors shadow-lg shadow-brand-500/25"
+            >
+              Descargar App
+            </a>
           </div>
         </div>
       </div>
-    </header>
-  );
-};
 
-export default Header;
+      <div
+        onClick={closeMenu}
+        className={`fixed inset-0 bg-black/20 z-40 transition-opacity duration-300 ${
+          menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        aria-hidden="true"
+      />
+    </>
+  );
+}
