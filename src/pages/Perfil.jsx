@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { User, Mail, Phone, MapPin, Calendar, Award, Heart, LogOut, FileText, Plus, X, Edit2, Check, Camera } from 'lucide-react';
 import user_picture from '../assets/avatar-user.png'
+import { buildImageUrl } from '../utils/imagen';
 import './Perfil.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -308,7 +309,7 @@ const Perfil = () => {
     setAgregando(null);
   };
 
-  const avatarSrc = (userProfile?.profilePicture || user?.profilePicture) || (user.picture ? `${API_URL}/Uploads/${user.picture}` : user_picture);
+  const avatarSrc = buildImageUrl(userProfile?.profilePicture || user?.profilePicture) || (user.picture ? `${API_URL}/Uploads/${user.picture}` : user_picture);
 
   const citasPendientes = appointments.pending.length;
   const citasCompletadas = appointments.completed.length;

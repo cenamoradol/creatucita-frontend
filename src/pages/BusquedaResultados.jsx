@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Search, MapPin, Filter, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { buildImageUrl } from '../utils/imagen';
 import './BusquedaResultados.css';
 
 const BusquedaResultados = () => {
@@ -83,7 +84,7 @@ const BusquedaResultados = () => {
         return {
           id: spec.id,
           nombre: spec.user ? spec.user.name : 'Usuario',
-          foto: spec.profilePicture || (spec.user && spec.user.profilePicture) || null,
+          foto: buildImageUrl(spec.profilePicture || (spec.user && spec.user.profilePicture)),
           categoria: categoryName,
           servicio: subcategoriesList,
           ciudad: spec.clinicAddress || 'Ubicación no especificada',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Mail, Phone, MapPin, Briefcase, Edit3, Save, X, Camera, Trash2 } from 'lucide-react';
+import { buildImageUrl } from '../../utils/imagen';
 import './PerfilView.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
@@ -18,14 +19,6 @@ const PerfilView = ({ especialista, token, appointments = [], onUpdate }) => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef(null);
-
-  const buildImageUrl = (imagePath) => {
-    if (!imagePath) return null;
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
-    }
-    return `${API_URL}${imagePath}`;
-  };
 
   useEffect(() => {
     if (especialista) {
